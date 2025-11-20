@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Browser-Based Attribute Extractor</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+
+        #output {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            margin-top: 20px;
+        }
+
+        #status {
+            margin-top: 10px;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .loading {
+            color: orange;
+        }
+
+        .ready {
+            color: green;
+        }
+
+        .model-selection,
+        .model-selected {
+            margin-bottom: 10px;
+        }
+    </style>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.0"></script>
+    <script type="importmap">
+        {
+          "imports": {
+                  "@huggingface/transformers": "https://cdn.jsdelivr.net/npm/@huggingface/transformers",
+                  "@mlc-ai/web-llm": "https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm"
+          }
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Local AI User Attribute Extractor</h1>
+    <p>Enter a conversation transcript below to extract attributes, preferences, interests, and dislikes. The model runs
+        entirely in your browser.</p>
+
+    <div class="model-selection">
+        Choose model:
+        <select id="technologySelect">
+            <option disabled selected value>Select a technology</option>
+            <option value="transformers">Huggingface Transformers</option>
+            <option value="webllm">WebLLM</option>
+        </select>
+        <select id="modelSelect">
+            <option disabled selected value>Select a model</option>
+        </select>
+        <button id="loadModelButton" disabled>Load Model</button>
+    </div>
+    <div class="model-selected">
+        Current model: <span id="current-model"></span>
+    </div>
+
+    <div>System prompt</div>
+    <textarea id="systemPrompt" placeholder="Enter system prompt here..." wrap="soft">
+You are an expert user profile analyst. Your goal is to analyze the conversation provided and extract key user attributes, preferences, interests, and dislikes.
+You MUST respond ONLY with a single JSON object that strictly adheres to the following structure:
+
+{
+    "attributes": ["list of descriptive words or phrases (e.g., 'Tech Savvy', 'Introverted')"],
+    "preferences": ["list of user likes and preferences (e.g., 'Prefers strong coffee', 'Likes working from home')"],
+    "interests": ["list of hobbies or topics they enjoy (e.g., 'Home brewing', 'Fantasy novels')"],
+    "dislikes": ["list of things the subject dislikes (e.g., 'Loud noises', 'Pointless meetings')"]
+}
+
+If a category has no information, use an empty array [].
+    </textarea>
+
+    <div>Conversation</div>
+    <textarea id="conversationInput" placeholder="Enter conversation transcript here..."></textarea>
+    <button id="extractButton" disabled>Extract Attributes</button>
+    <div id="status"></div>
+
+    <h3>Extracted JSON Output:</h3>
+    <div id="output"></div>
+
+    <script type="module" src="app.js"></script>
+</body>
+
+</html>
